@@ -73,13 +73,13 @@ import { ref, onMounted } from 'vue';
 import { getCategoryList, delCategory } from '../../api';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import CategoryEdit from '../../components/CategoryEdit.vue';
-import { Picture, Edit, Delete, Plus } from '@element-plus/icons-vue'; // 引入图标
+import { Picture, Edit, Delete, Plus } from '@element-plus/icons-vue';
 
 const tableData = ref([]);
 const dialogVisible = ref(false);
 const id = ref(0);
 const categoryForm = ref();
-const tableRef = ref(); // 用于操作表格实例，例如清空选择等
+const tableRef = ref();
 
 onMounted(() => {
   loadCategoryList();
@@ -87,28 +87,26 @@ onMounted(() => {
 
 const loadCategoryList = async () => {
   const data = await getCategoryList();
-  // 假设API返回的数据可能包含status字段，1为启用，0为禁用
-  // 此处为示例，如果实际数据没有status，可以移除或根据实际情况调整
+  
   const processedData = data.map(item => ({ ...item, status: item.status === undefined ? 1 : item.status }));
   tableData.value = convertToTree(processedData);
 };
 
-// 将一维数组转换成树形结构的方法
 const convertToTree = data => {
   const treeData = []
   const map = {}
-  // 遍历一维数组数据，建立节点映射表
+  
   for (const item of data) {
     map[item.id] = { ...item, children: [] }
   }
-  // 遍历映射表，将节点添加到父节点的children中
+  
   for (const item of data) {
     const node = map[item.id]
     if (item.pid === 0) {
       treeData.push(node)
     } else {
       const parent = map[item.pid]
-      if (parent) { //确保父节点存在
+      if (parent) {
         parent.children.push(node)
       }
     }
@@ -118,27 +116,12 @@ const convertToTree = data => {
 
 const addRow = () => {
   id.value = 0;
-  // dialogVisible.value = true; // CategoryEdit 内部可能会重置表单，先打开dialog再调用resetForm更稳妥
-  // if (categoryForm.value) { // 确保 categoryForm 存在，因为 dialog 内容是惰性渲染的
-  //   categoryForm.value.resetForm(0);
-  // }
-  // 更改为先打开对话框，再在nextTick中调用resetForm
   dialogVisible.value = true;
-  // nextTick(() => { //  如果CategoryEdit内部没有自动重置逻辑，可以在这里调用
-  //   if (categoryForm.value) {
-  //     categoryForm.value.resetForm(0);
-  //   }
-  // });
 };
 
 const editRow = (row) => {
   id.value = row.id;
   dialogVisible.value = true;
-  // nextTick(() => { // 同上，如果CategoryEdit内部没有自动重置逻辑，可以在这里调用
-  //   if (categoryForm.value) {
-  //    categoryForm.value.resetForm(row.id);
-  //   }
-  // });
 };
 
 const delRow = (row) => {
@@ -155,12 +138,9 @@ const delRow = (row) => {
       draggable: true,
     }).then(async () => {
       const result = await delCategory({ id: row.id });
-      // 假设 delCategory 返回一个包含 success 属性的对象或直接是布尔值
       if (result && (result.success === undefined || result.success)) { 
         ElMessage.success('删除成功');
         loadCategoryList();
-      } else {
-        // ElMessage.error(result.message || '删除失败'); // 如果API返回错误信息
       }
     }).catch(() => {
       ElMessage.info('已取消删除');
@@ -175,20 +155,6 @@ const editSuccess = () => {
 };
 
 const handleBeforeClose = (done) => {
-  // 检查 CategoryEdit 组件内部是否有isDirty之类的状态来判断表单是否被修改过
-  // if (categoryForm.value && categoryForm.value.isFormDirty()) { // 假设有 isFormDirty 方法
-  //   ElMessageBox.confirm('表单内容已修改，确定关闭对话框吗？未保存的更改将会丢失。', '提示', {
-  //     confirmButtonText: '确定关闭',
-  //     cancelButtonText: '继续编辑',
-  //     type: 'warning',
-  //     draggable: true,
-  //   }).then(() => {
-  //     done(); 
-  //   }).catch(() => {});
-  // } else {
-  //   done();
-  // }
-  // 简化版：总是提示，如果需要更智能的提示，需要 CategoryEdit 组件配合
    ElMessageBox.confirm('确定关闭对话框吗？', '提示',{
       confirmButtonText: '确定',
       cancelButtonText: '取消',
@@ -198,7 +164,6 @@ const handleBeforeClose = (done) => {
       done(); 
     }).catch(() => {});
 };
-
 </script>
 
 <style scoped>

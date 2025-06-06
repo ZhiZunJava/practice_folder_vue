@@ -1,0 +1,21 @@
+{
+  "name": "mall-frontend",
+  "version": "1.0.0",
+  "description": "商城前台项目",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0",
+    "vant": "^4.8.7",
+    "axios": "^1.6.8",
+    "@vant/touch-emulator": "^1.4.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.2.8"
+  }
+} 

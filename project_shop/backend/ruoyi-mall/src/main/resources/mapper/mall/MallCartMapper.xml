@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.mall.mapper.MallCartMapper">
+    
+    <resultMap type="MallCart" id="MallCartResult">
+        <result property="cartId"    column="cart_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="productId"    column="product_id"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <resultMap type="MallCart" id="MallCartWithProductResult" extends="MallCartResult">
+        <association property="product" javaType="MallProduct">
+            <result property="productId"    column="p_product_id"    />
+            <result property="productName"    column="p_product_name"    />
+            <result property="productImage"    column="p_product_image"    />
+            <result property="currentPrice"    column="p_current_price"    />
+            <result property="stock"    column="p_stock"    />
+            <result property="status"    column="p_status"    />
+        </association>
+    </resultMap>
+
+    <sql id="selectMallCartVo">
+        select cart_id, user_id, product_id, quantity, create_time, update_time from mall_cart
+    </sql>
+
+    <sql id="selectMallCartWithProductVo">
+        select c.cart_id, c.user_id, c.product_id, c.quantity, c.create_time, c.update_time,
+               p.product_id as p_product_id, p.product_name as p_product_name, p.product_image as p_product_image, 
+               p.current_price as p_current_price, p.stock as p_stock, p.status as p_status
+        from mall_cart c
+        left join mall_product p on c.product_id = p.product_id and p.del_flag = '0'
+    </sql>
+
+    <select id="selectMallCartList" parameterType="MallCart" resultMap="MallCartResult">
+        <include refid="selectMallCartVo"/>
+        <where>  
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="productId != null "> and product_id = #{productId}</if>
+        </where>
+        order by create_time desc
+    </select>
+    
+    <select id="selectMallCartByCartId" parameterType="Long" resultMap="MallCartResult">
+        <include refid="selectMallCartVo"/>
+        where cart_id = #{cartId}
+    </select>
+
+    <select id="selectCartByUserId" parameterType="Long" resultMap="MallCartWithProductResult">
+        <include refid="selectMallCartWithProductVo"/>
+        where c.user_id = #{userId} and p.status = '0'
+        order by c.create_time desc
+    </select>
+
+    <select id="selectCartByUserIdAndProductId" resultMap="MallCartResult">
+        <include refid="selectMallCartVo"/>
+        where user_id = #{userId} and product_id = #{productId}
+    </select>
+        
+    <insert id="insertMallCart" parameterType="MallCart" useGeneratedKeys="true" keyProperty="cartId">
+        insert into mall_cart
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="productId != null">product_id,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="productId != null">#{productId},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMallCart" parameterType="MallCart">
+        update mall_cart
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where cart_id = #{cartId}
+    </update>
+
+    <delete id="deleteMallCartByCartId" parameterType="Long">
+        delete from mall_cart where cart_id = #{cartId}
+    </delete>
+
+    <delete id="deleteMallCartByCartIds" parameterType="String">
+        delete from mall_cart where cart_id in 
+        <foreach item="cartId" collection="array" open="(" separator="," close=")">
+            #{cartId}
+        </foreach>
+    </delete>
+
+    <delete id="clearCartByUserId" parameterType="Long">
+        delete from mall_cart where user_id = #{userId}
+    </delete>
+
+</mapper> 

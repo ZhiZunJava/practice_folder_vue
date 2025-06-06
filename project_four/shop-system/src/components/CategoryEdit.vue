@@ -57,7 +57,6 @@ const props = defineProps({
     type: Number
   }
 })
-
 const emit = defineEmits(['success'])
 
 const form = reactive({

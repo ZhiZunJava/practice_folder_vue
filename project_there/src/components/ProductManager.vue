@@ -167,39 +167,12 @@ const products = ref([
   },
   {
     id: 2,
-    name: '阿迪达斯运动鞋',
-    category: '服装',
-    price: 699.00,
-    stock: 100,
-    status: '上架',
-    description: '舒适透气的运动鞋，适合日常运动'
-  },
-  {
-    id: 3,
-    name: '有机苹果',
-    category: '食品',
-    price: 25.00,
-    stock: 200,
-    status: '上架',
-    description: '新鲜有机苹果，富含维生素'
-  },
-  {
-    id: 4,
     name: 'Vue.js实战指南',
     category: '图书',
     price: 89.00,
     stock: 30,
     status: '下架',
     description: 'Vue.js从入门到精通的实战教程'
-  },
-  {
-    id: 5,
-    name: '智能台灯',
-    category: '家居用品',
-    price: 299.00,
-    stock: 75,
-    status: '上架',
-    description: '可调光护眼台灯，支持手机App控制'
   }
 ])
 
@@ -313,8 +286,6 @@ const handleSubmit = async () => {
   try {
     await productForm.value.validate()
     submitLoading.value = true
-    
-    // 模拟API调用延迟
     await new Promise(resolve => setTimeout(resolve, 1000))
     
     if (dialogType.value === 'add') {
@@ -363,12 +334,6 @@ const resetForm = () => {
     productForm.value.clearValidate()
   }
 }
-
-// 组件挂载时的初始化
-onMounted(() => {
-  // 这里可以添加初始化逻辑，比如从API获取商品数据
-  console.log('商品管理组件已挂载')
-})
 </script>
 
 <style scoped>
